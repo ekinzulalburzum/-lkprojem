@@ -1,0 +1,68 @@
+{
+  "entities": {
+    "sheep": {
+      "title": "Sheep",
+      "description": "Represents a mature sheep (ewe or ram) in the herd.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Unique tag ID or RFID" },
+        "name": { "type": "string", "description": "Nickname if any" },
+        "breed": { "type": "string", "description": "Breed type" },
+        "birthDate": { "type": "string", "format": "date" },
+        "gender": { "type": "string", "enum": ["Ewe", "Ram"] },
+        "status": { "type": "string", "enum": ["Healthy", "Pregnant", "Sick", "Sold", "Deceased"] },
+        "notes": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "gender", "status"]
+    },
+    "lamb": {
+      "title": "Lamb",
+      "description": "Represents a lamb born in the farm.",
+      "type": "object",
+      "properties": {
+        "tagId": { "type": "string", "description": "Unique tag ID" },
+        "motherId": { "type": "string", "description": "ID of the mother sheep" },
+        "birthDate": { "type": "string", "format": "date-time" },
+        "birthWeight": { "type": "number" },
+        "gender": { "type": "string", "enum": ["Male", "Female"] },
+        "status": { "type": "string" },
+        "weaningDate": { "type": "string", "format": "date" },
+        "notes": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["tagId", "motherId", "birthDate", "gender"]
+    },
+    "healthRecord": {
+      "title": "Health Record",
+      "description": "Record of vaccinations, treatments, or health checks.",
+      "type": "object",
+      "properties": {
+        "animalId": { "type": "string", "description": "ID of the sheep or lamb" },
+        "date": { "type": "string", "format": "date" },
+        "type": { "type": "string", "description": "Vaccination, Treatment, Deworming, etc." },
+        "medicine": { "type": "string" },
+        "dosage": { "type": "string" },
+        "notes": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["animalId", "date", "type"]
+    }
+  },
+  "firestore": {
+    "/sheep": {
+      "schema": "sheep",
+      "description": "Collection of mature sheep."
+    },
+    "/lambs": {
+      "schema": "lamb",
+      "description": "Collection of lambs."
+    },
+    "/health_records": {
+      "schema": "healthRecord",
+      "description": "Collection of medical history for all animals."
+    }
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "name": "Remix: LambTrace",
+  "description": "A smart management tool for tracking lamb growth, health, and breeding records to optimize flock productivity.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

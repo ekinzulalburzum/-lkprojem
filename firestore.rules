@@ -1,0 +1,86 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // 0. Default Deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // 3. Global Helpers
+    function isSignedIn() { return request.auth != null; }
+    function isAdmin() { return isSignedIn() && request.auth.token.email == 'ekinzulal@gmail.com' && request.auth.token.email_verified == true; }
+    function isOwner(data) { return isSignedIn(); } // In this app, we assume shared access or single farm for now, but usually we'd have a farmId
+    function incoming() { return request.resource.data; }
+    function existing() { return resource.data; }
+    function isValidId(id) { return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$'); }
+    function isServerTimestamp(field) { return incoming()[field] == request.time; }
+
+    // 2. Validation Blueprints
+    function isValidSheep(data) {
+      return data.id is string && data.id.size() > 0 && data.id.size() <= 64 &&
+             data.gender in ['Ewe', 'Ram'] &&
+             data.status in ['Healthy', 'Pregnant', 'Sick', 'Sold', 'Deceased'] &&
+             (!('breed' in data) || data.breed is string) &&
+             (!('notes' in data) || data.notes is string);
+    }
+
+    function isValidLamb(data) {
+      return data.tagId is string && data.tagId.size() > 0 && data.tagId.size() <= 64 &&
+             data.motherId is string &&
+             data.gender in ['Male', 'Female'] &&
+             data.birthDate is timestamp &&
+             (!('birthWeight' in data) || data.birthWeight is number) &&
+             (!('status' in data) || data.status is string);
+    }
+
+    function isValidHealthRecord(data) {
+      return data.animalId is string &&
+             data.date is string &&
+             data.type is string &&
+             (!('medicine' in data) || data.medicine is string) &&
+             (!('dosage' in data) || data.dosage is string);
+    }
+
+    // 4. Match Blocks
+    
+    match /sheep/{sheepId} {
+      allow get: if isSignedIn();
+      allow list: if isSignedIn(); // Restricted to signed in users
+      allow create: if isSignedIn() && isValidSheep(incoming()) && isServerTimestamp('createdAt');
+      allow update: if isSignedIn() && isValidSheep(incoming()) && (
+        isAdmin() || (
+          incoming().diff(existing()).affectedKeys().hasOnly(['name', 'breed', 'status', 'notes', 'updatedAt']) &&
+          isServerTimestamp('updatedAt')
+        )
+      );
+      allow delete: if isAdmin();
+    }
+
+    match /lambs/{lambId} {
+      allow get: if isSignedIn();
+      allow list: if isSignedIn();
+      allow create: if isSignedIn() && isValidLamb(incoming()) && isServerTimestamp('createdAt');
+      allow update: if isSignedIn() && isValidLamb(incoming()) && (
+        isAdmin() || (
+          incoming().diff(existing()).affectedKeys().hasOnly(['status', 'weaningDate', 'notes', 'updatedAt']) &&
+          isServerTimestamp('updatedAt')
+        )
+      );
+      allow delete: if isAdmin();
+    }
+
+    match /health_records/{recordId} {
+      allow get: if isSignedIn();
+      allow list: if isSignedIn();
+      allow create: if isSignedIn() && isValidHealthRecord(incoming()) && isServerTimestamp('createdAt');
+      allow update: if isSignedIn() && isValidHealthRecord(incoming()) && (
+        isAdmin() || (
+          incoming().diff(existing()).affectedKeys().hasOnly(['medicine', 'dosage', 'notes'])
+        )
+      );
+      allow delete: if isAdmin();
+    }
+  }
+}
