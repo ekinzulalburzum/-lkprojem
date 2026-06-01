@@ -4,11 +4,28 @@
 @theme {
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+
+  /* Natural Shepherd & Pastoral Meadow Palette */
+  --color-white: #fefcf7;       /* Soft warm fleece/wool white instead of flat stark white */
+  --color-black: #112516;       /* Deep rich grassland pine-black instead of clinical dark black */
+  --color-gray-50: #f6f3eb;     /* Soft warm wheat straw */
+  --color-gray-100: #eeeae0;    /* Mellow dry clay */
+  --color-gray-200: #e0d8c8;    /* Natural sand-earth soil */
+  --color-gray-300: #ccbfac;    /* Muffled fleece linen grey */
+  --color-gray-400: #b2a28d;    /* Fawn brown */
+  --color-gray-500: #938470;    /* Earthy taupe */
+  --color-gray-600: #746654;    /* Slate wood bark */
+  --color-gray-700: #5c5040;    /* Coffee soil */
+  --color-gray-800: #42382c;    /* Deep basalt peat */
+  --color-gray-900: #201a14;    /* Charcoal soil */
 }
 
 @layer base {
+  html {
+    font-size: 18px !important; /* Globally shifts everything 2px larger beautifully so all text is highly visible */
+  }
   body {
-    @apply bg-[#f8f9fa] text-gray-900 antialiased;
+    @apply bg-[#edf1ea] text-gray-900 antialiased tracking-tight font-medium; /* Pastoral meadow backdrop with bolder default weight */
   }
 }
 
